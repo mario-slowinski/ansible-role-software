@@ -3,10 +3,4 @@ software_keys: []
 
 software_repos: []
 
-software_pkgs:
-  - name:
-      - openssh-server
-    state: "latest"
-    autoremove: false
-    update_cache: true
-    accept_licenses: true
+software_pkgs: []
