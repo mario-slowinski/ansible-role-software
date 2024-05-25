@@ -3,7 +3,8 @@
   tags: software.pkg
   ansible.builtin.apt:
     name: "{{ item['name'] | default(omit, true) }}"
-    allow_unauthenticated: "{{ item['allow_unauthenticated'] | default(omit, true) }}"
+    allow_unauthenticated: >-
+      {{ item['allow_unauthenticated'] | default(omit, true) }}
     autoclean: "{{ item['autoclean'] | default(omit, true) }}"
     autoremove: "{{ item['autoremove'] | default(omit, true) }}"
     cache_valid_time: "{{ item['cache_valid_time'] | default(omit, true) }}"
@@ -19,12 +20,16 @@
     purge: "{{ item['purge'] | default(omit, true) }}"
     state: "{{ item['state'] | default(omit, true) }}"
     update_cache: "{{ item['update_cache'] | default(omit, true) }}"
-    update_cache_retries: "{{ item['update_cache_retries'] | default(omit, true) }}"
-    update_cache_retry_max_delay: "{{ item['update_cache_retry_max_delay'] | default(omit, true) }}"
+    update_cache_retries: >-
+      {{ item['update_cache_retries'] | default(omit, true) }}
+    update_cache_retry_max_delay: >-
+      {{ item['update_cache_retry_max_delay'] | default(omit, true) }}
     upgrade: "{{ item['upgrade'] | default(omit, true) }}"
   loop: "{{ software_pkgs }}"
   loop_control:
-    label: "{{ item['name'] | default(item['deb'], true) }} state={{ item['state'] | default('present') }}"
+    label: >-
+      {{ item['name'] | default(item['deb'], true) }}
+      state={{ item['state'] | default('present') }}
   become: true
   environment:
     DEBIAN_FRONTEND: noninteractive
@@ -52,7 +57,8 @@
     repo: "{{ item['repo'] | mandatory }}"
     update_cache: "{{ item['update_cache'] | default(omit) }}"
     update_cache_retries: "{{ item['update_cache_retries'] | default(omit) }}"
-    update_cache_retry_max_delay: "{{ item['update_cache_retry_max_delay'] | default(omit) }}"
+    update_cache_retry_max_delay: >-
+      {{ item['update_cache_retry_max_delay'] | default(omit) }}
     validate_certs: "{{ item['validate_certs'] | default(omit) }}"
     state: "{{ item['state'] | default(omit) }}"
   loop: "{{ software_repos }}"
@@ -63,5 +69,9 @@
     - never
     - software.info
   ansible.builtin.command: dpkg-query -f ${Version} -W {{ item | quote }}
-  loop: "{{ software_pkgs | selectattr('state','ne','absent') | map(attribute='name') | flatten }}"
+  loop: >-
+    {{ software_pkgs
+    | selectattr('state', 'ne', 'absent')
+    | map(attribute='name') | flatten }}
+  changed_when: false
   register: software_info
